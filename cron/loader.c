@@ -25,8 +25,9 @@ CronError load_crontab(const char *path, Task **tasks_out, size_t *out_count)
 
     while (getline(&line, &cap, f) != -1) {
         Task *task = task_init();
-        int8_t parse_ok = parse_line_into_task(line, task);
-        if (!parse_ok) {
+        ParserError parse_status = parse_line_into_task(line, task);
+        if (parse_status != PARSER_OK) {
+            printf("parse failed with code %d\n", parse_status);
             rc = CRON_ERR_PARSE_CONFIG;
             goto cleanup;
         }

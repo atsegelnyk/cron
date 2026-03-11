@@ -3,6 +3,14 @@
 
 #include "task/task.h"
 
-int8_t parse_line_into_task(char *line, Task *task);
+typedef enum ParserError {
+    PARSER_OK = 0,
+    PARSER_FAILED,
+    PARSER_ERR_SPLIT_LINE,
+    PARSER_ERR_INSUFFICIENT_TOKEN_COUNT,
+    PARSER_ERR_PARSE_TOKENS,
+} ParserError;
+
+ParserError parse_line_into_task(char *line, Task *task);
 
 #endif //PARSER_H

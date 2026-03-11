@@ -17,26 +17,29 @@ int8_t parse_range(char *token, uint8_t *start_range, uint8_t *end_range);
 
 int8_t convert_value(char *token);
 
-int8_t parse_line_into_task(char *line, Task *task) 
+ParserError parse_line_into_task(char *line, Task *task)
 {
     char **tokens = NULL;
     uint8_t count = 0;
 
-    int8_t rc = -1;
+    ParserError rc;
 
     if (split_tokens(line, " ", &tokens, &count) != 0) {
+        rc = PARSER_ERR_SPLIT_LINE;
         goto cleanup;
     }
 
     if (count < 6) {
+        rc = PARSER_ERR_INSUFFICIENT_TOKEN_COUNT;
         goto cleanup;        
     }
 
     if (parse_tokens_into_task(tokens, count, task) != 0) {
+        rc = PARSER_ERR_PARSE_TOKENS;
         goto cleanup;
     }
 
-    rc = 0;
+    rc = PARSER_OK;
 
     cleanup:
         free(tokens);
