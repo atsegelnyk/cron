@@ -44,6 +44,7 @@ void cron_destroy(Cron *cron)
 
 CronError cron_run(Cron *cron)
 {
+    printf("cron iteration\n");
     CronError rc =  cron_iter(cron);
     if (rc != CRON_OK)
         return rc;
@@ -68,10 +69,14 @@ CronError cron_iter(Cron *cron)
     const time_t now = time(NULL);
 
     for (size_t i = 0; i < cron->NumTasks; i++) {
+        printf("execute task %lu\n", i);
         rc = process_task(cron->Tasks[i], now);
         if (rc != CRON_OK) {
             printf("cron_process_task failed with code: %d\n", rc);
+            continue;
         }
+
+        printf("execute task %lu: success \n", i);
     }
 
     return rc;
