@@ -24,6 +24,8 @@ CronError load_crontab(const char *path, Task **tasks_out, size_t *out_count)
     size_t cap = 0;
 
     while (getline(&line, &cap, f) != -1) {
+        line[strcspn(line, "\n")] = '\0';
+
         Task *task = task_init();
         ParserError parse_status = parse_line_into_task(line, task);
         if (parse_status != PARSER_OK) {
