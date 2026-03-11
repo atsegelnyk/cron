@@ -38,4 +38,4 @@ struct Task {
 Task* task_init(void);
 void task_destroy(Task* task);
 
-#endif
+#endif //TASK_H
