@@ -37,7 +37,6 @@ int8_t parse_line_into_task(char *line, Task *task)
     }
 
     rc = 0;
-    goto cleanup;
 
     cleanup:
         free(tokens);
@@ -78,11 +77,11 @@ int8_t parse_tokens_into_task(char **tokens, uint8_t count, Task *task)
     task->Month = monthSchedule;
     task->Weekday = weekdaySchedule;
 
-    uint8_t commandTokenCount = count-5;
+    uint8_t commandTokenCount = count-5 + 1; //extra token for NULL termination
     char** commandTokens = malloc(sizeof(char*)*commandTokenCount);
     memcpy(commandTokens, &tokens[5], sizeof(char*)*commandTokenCount);
+    commandTokens[commandTokenCount] = NULL;
 
-    task->Argc = (int8_t)commandTokenCount;
     task->Argv = commandTokens;
 
     return 0;

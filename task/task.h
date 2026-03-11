@@ -2,6 +2,7 @@
 #define TASK_H
 
 #include <stdint.h>
+#include <stdio.h>
 
 typedef enum {
     DEFAULT,
@@ -17,7 +18,7 @@ struct Schedule {
     int8_t Default;
 
     uint8_t* List;
-    uint8_t NumListItems;
+    size_t NumListItems;
 
     uint8_t RangeStart;
     uint8_t RangeEnd;
@@ -31,7 +32,6 @@ struct Task {
     Schedule Month;
     Schedule Weekday;
 
-    int8_t Argc;
     char** Argv;
 };
 
