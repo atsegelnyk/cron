@@ -1,8 +1,11 @@
 .idea
-cmake-build-default
-build
-Makefile
 CMakeCache.txt
 CMakeFiles
 cmake_install.cmake
 crond
+.cmake
+Testing
+compile_commands.json
+build.ninja
+.ninja_log
+.ninja_deps

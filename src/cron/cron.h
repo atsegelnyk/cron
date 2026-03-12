@@ -6,7 +6,7 @@
 #ifndef CRON_H
 #define CRON_H
 
-#include "task/task.h"
+#include "task.h"
 #include <stdint.h>
 
 typedef enum {
@@ -16,6 +16,7 @@ typedef enum {
     CRON_ERR_LOAD_CONFIG,
     CRON_ERR_PARSE_CONFIG,
     CRON_ERR_EXECUTE_TASK,
+    CRON_ERR_FORK_FAILED,
 } CronError;
 
 typedef struct Cron Cron;

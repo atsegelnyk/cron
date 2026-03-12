@@ -1,5 +1,5 @@
 #include "parser.h"
-#include "task/task.h"
+#include "task.h"
 
 #include <stdint.h>
 #include <string.h>
@@ -80,8 +80,8 @@ int8_t parse_tokens_into_task(char **tokens, uint8_t count, Task *task)
     task->Month = monthSchedule;
     task->Weekday = weekdaySchedule;
 
-    uint8_t commandTokenCount = count-5 + 1; //extra token for NULL termination
-    char** commandTokens = malloc(sizeof(char*)*commandTokenCount);
+    uint8_t commandTokenCount = count - 5;
+    char **commandTokens = malloc(sizeof(char*) * (commandTokenCount + 1));
     memcpy(commandTokens, &tokens[5], sizeof(char*)*commandTokenCount);
     commandTokens[commandTokenCount] = NULL;
 

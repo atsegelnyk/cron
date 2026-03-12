@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 #include "cron.h"
+#include "task.h"
 
 CronError execute_task(Task task);
 

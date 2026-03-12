@@ -44,14 +44,12 @@ void cron_destroy(Cron *cron)
 
 CronError cron_run(Cron *cron)
 {
-    printf("cron iteration\n");
-    CronError rc =  cron_iter(cron);
+    CronError rc = cron_iter(cron);
     if (rc != CRON_OK)
         return rc;
 
     for (;;) {
         sleep(60);
-        printf("cron iteration\n");
         rc = cron_iter(cron);
         if (rc != CRON_OK)
             return rc;
@@ -62,21 +60,26 @@ CronError cron_iter(Cron *cron)
 {
     CronError rc = cron_set_tasks(cron);
     if (rc != CRON_OK) {
-        printf("crontab load failed with code: %d\n", rc);
+        printf("cron main: crontab load failed with code: %d\n", rc);
         return rc;
     }
 
+    if (cron->NumTasks == 0) {
+        printf("cron main: no cron tasks found\n");
+        return CRON_OK;
+    }
+
+    printf("cron main: execute %lu tasks\n", cron->NumTasks);
     const time_t now = time(NULL);
 
     for (size_t i = 0; i < cron->NumTasks; i++) {
-        printf("execute task %lu\n", i);
         rc = process_task(cron->Tasks[i], now);
         if (rc != CRON_OK) {
-            printf("cron_process_task failed with code: %d\n", rc);
+            printf("execute task %lu failed with code: %d\n", i, rc);
             continue;
         }
 
-        printf("execute task %lu: success \n", i);
+        printf("execute task %lu: success\n", i);
     }
 
     return rc;
@@ -91,7 +94,7 @@ CronError cron_set_tasks(Cron *cron)
         return rc;
     }
 
-    free(cron->Tasks);
+    destroy_tasks(cron->Tasks, cron->NumTasks);
 
     cron->NumTasks = num_tasks;
     cron->Tasks = new_tasks;
@@ -113,7 +116,7 @@ bool task_matches_time(const Task task, const time_t now)
 {
     const struct tm *t = localtime(&now);
 
-    bool matches_time = false;
+    bool matches_time;
     matches_time = schedule_matches_time_cond(task.Minute, t->tm_min);
     if (!matches_time) {
         return false;

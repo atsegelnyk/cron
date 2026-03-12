@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 typedef enum {
     DEFAULT,
@@ -33,9 +34,27 @@ struct Task {
     Schedule Weekday;
 
     char** Argv;
+    char* _rawLine;
 };
 
-Task* task_init(void);
-void task_destroy(Task* task);
+static void destroy_task(Task *task) {
+    if (!task) return;
+
+    free(task->Argv);
+    free(task->_rawLine);
+
+    task->Argv = NULL;
+    task->_rawLine = NULL;
+}
+
+static void destroy_tasks(Task *tasks, size_t num) {
+    if (!tasks) return;
+
+    for (size_t i = 0; i < num; i++) {
+        destroy_task(&tasks[i]);
+    }
+
+    free(tasks);
+}
 
 #endif //TASK_H

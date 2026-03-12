@@ -1,7 +1,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include "task/task.h"
+#include "task.h"
 
 typedef enum ParserError {
     PARSER_OK = 0,
