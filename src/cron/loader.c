@@ -3,72 +3,80 @@
 #include <stdlib.h>
 #include <string.h>
 
+CronError read_crontab_file(const char *path, char ***lines_out, size_t *n_lines_out);
+
 CronError load_crontab(const char *path, Task **tasks_out, size_t *out_count)
 {
-    CronError rc;
+    char **lines = NULL;
+    size_t lines_num = 0;
+    CronError read_status = read_crontab_file(path, &lines, &lines_num);
+    if (read_status != CRON_OK) return read_status;
 
-    Task stack_tasks[16];
-    Task *tasks = stack_tasks;
-
-    size_t tasks_cap = 16;
     size_t tasks_count = 0;
+    Task *tasks = malloc(sizeof(Task) * lines_num);
 
-    FILE *f = fopen(path, "r");
-    if (!f) {
-        perror(path);
-        rc = CRON_ERR_READ_CRONTAB;
-        goto cleanup;
-    }
+    for (size_t i = 0; i < lines_num; i++) {
+        tasks[tasks_count].raw = lines[i];
 
-    char *line = NULL;
-    size_t cap = 0;
-
-    while (getline(&line, &cap, f) != -1) {
-        line[strcspn(line, "\n")] = '\0';
-
-        char* line_cpy = strdup(line);
-        tasks[tasks_count]._rawLine = line_cpy;
-
-        ParserError parse_status = parse_line_into_task(line_cpy, &tasks[tasks_count]);
+        ParserError parse_status = parse_line_into_task(lines[i], &tasks[tasks_count]);
         if (parse_status != PARSER_OK) {
             printf("parse failed with code %d\n", parse_status);
-            rc = CRON_ERR_PARSE_CONFIG;
-            goto cleanup;
-        }
-
-        if (tasks_count >= tasks_cap) {
-            tasks_cap *= 2;
-            Task *new_tasks;
-
-            if (tasks == stack_tasks) {
-                new_tasks = malloc(cap * sizeof(Task));
-                if (!new_tasks) {
-                    rc = CRON_ERR_LOAD_CONFIG;
-                    free(new_tasks);
-                    free(line);
-                    goto cleanup;
-                }
-
-                memcpy(new_tasks, stack_tasks, tasks_count * sizeof(Task));
-            } else {
-                new_tasks = realloc(tasks, tasks_cap * sizeof(Task));
-                if (!new_tasks) {
-                    rc = CRON_ERR_LOAD_CONFIG;
-                    free(new_tasks);
-                    free(line);
-                    goto cleanup;
-                }
-            }
-
-            tasks = new_tasks;
+            free(tasks);
+            free(lines);
+            return CRON_ERR_READ_CRONTAB;
         }
 
         tasks_count++;
     }
 
-    rc = CRON_OK;
     *tasks_out = tasks;
     *out_count = tasks_count;
+
+    return CRON_OK;
+}
+
+CronError read_crontab_file(const char *path, char ***lines_out, size_t *n_lines_out)
+{
+    CronError rc = CRON_ERR_READ_CRONTAB;
+
+    FILE *f = fopen(path, "r");
+    if (!f) {
+        perror(path);
+        goto cleanup;
+    }
+
+    size_t lines_count = 0;
+    size_t lines_capacity = 16;
+    char **lines = malloc(lines_capacity * sizeof(char *));
+    if (!lines) {
+        goto cleanup;
+    }
+
+    for (;;) {
+        char *line = NULL;
+        size_t cap = 0;
+        if (getline(&line, &cap, f) == -1) break;
+
+        line[strcspn(line, "\n")] = '\0';
+
+        if (lines_capacity == lines_count) {
+            lines_capacity *= 2;
+            char **new_lines = realloc(lines, sizeof(char*) * lines_capacity);
+            if (!new_lines) {
+                free(lines);
+                goto cleanup;
+            }
+
+            lines = new_lines;
+        }
+
+        lines[lines_count] = line;
+        lines_count++;
+    }
+
+    rc = CRON_OK;
+    *lines_out = lines;
+    *n_lines_out = lines_count;
 
     cleanup:
         fclose(f);

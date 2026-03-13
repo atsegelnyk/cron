@@ -34,17 +34,17 @@ struct Task {
     Schedule Weekday;
 
     char** Argv;
-    char* _rawLine;
+    char* raw;
 };
 
 static void destroy_task(Task *task) {
     if (!task) return;
 
     free(task->Argv);
-    free(task->_rawLine);
+    free(task->raw);
 
     task->Argv = NULL;
-    task->_rawLine = NULL;
+    task->raw = NULL;
 }
 
 static void destroy_tasks(Task *tasks, size_t num) {

@@ -73,9 +73,9 @@ CronError cron_iter(Cron *cron)
     const time_t now = time(NULL);
 
     for (size_t i = 0; i < cron->NumTasks; i++) {
-        rc = process_task(cron->Tasks[i], now);
-        if (rc != CRON_OK) {
-            printf("execute task %lu failed with code: %d\n", i, rc);
+        CronError task_rc = process_task(cron->Tasks[i], now);
+        if (task_rc != CRON_OK) {
+            printf("execute task %lu failed with code: %d\n", i, task_rc);
             continue;
         }
 
@@ -105,7 +105,8 @@ CronError cron_set_tasks(Cron *cron)
 CronError process_task(const Task task, const time_t now)
 {
     if (!task_matches_time(task, now)) {
-        return CRON_OK;
+        printf("task sched does not match current time, skipping\n");
+        return CRON_ERR_EXECUTION_SKIPPED;
     }
 
     return execute_task(task);
