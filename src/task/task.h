@@ -37,24 +37,6 @@ struct Task {
     char* raw;
 };
 
-static void destroy_task(Task *task) {
-    if (!task) return;
-
-    free(task->Argv);
-    free(task->raw);
-
-    task->Argv = NULL;
-    task->raw = NULL;
-}
-
-static void destroy_tasks(Task *tasks, size_t num) {
-    if (!tasks) return;
-
-    for (size_t i = 0; i < num; i++) {
-        destroy_task(&tasks[i]);
-    }
-
-    free(tasks);
-}
+void destroy_tasks(Task *tasks, size_t num);
 
 #endif //TASK_H

@@ -12,6 +12,8 @@ add_executable(crond
         src/cron/executor.h
         src/cron/executor.c
         src/cron/loader.h
+        src/task/task.h
+        src/task/task.c
 )
 
 target_include_directories(crond PRIVATE
