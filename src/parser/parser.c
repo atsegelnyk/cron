@@ -19,6 +19,8 @@ int8_t convert_value(char *token);
 
 ParserError parse_line_into_task(char *line, Task *task)
 {
+    if (strlen(line) == 0) return PARSER_EMPTY_LINE;
+
     char **tokens = NULL;
     uint8_t count = 0;
 

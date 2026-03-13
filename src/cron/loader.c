@@ -19,6 +19,7 @@ CronError load_crontab(const char *path, Task **tasks_out, size_t *out_count)
         tasks[tasks_count].raw = lines[i];
 
         ParserError parse_status = parse_line_into_task(lines[i], &tasks[tasks_count]);
+        if (parse_status == PARSER_EMPTY_LINE) continue;
         if (parse_status != PARSER_OK) {
             printf("parse failed with code %d\n", parse_status);
             free(tasks);

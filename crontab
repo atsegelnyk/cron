@@ -1,3 +1,4 @@
 * * * * * touch foo
 * * * * * git add foo
+
 0 0 * * * git add bar
